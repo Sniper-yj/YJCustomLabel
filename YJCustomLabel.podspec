@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
 
   s.name         = "YJCustomLabel"
   s.version      = "0.0.1"
-  s.summary      = "A short description of YJCustomLabel."
+  s.summary      = "It's a good customLabel to use"
 
   s.description  = <<-DESC
                    A longer description of YJCustomLabel in Markdown format.
