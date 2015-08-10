@@ -57,6 +57,7 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         _textColor = [UIColor blackColor];
         _lineSpace = 5;
         _headSpace = 0;
+        _wordSpace = 10;
         
     }
     return self;
@@ -100,9 +101,15 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
     CTParagraphStyleRef paragraphStyle = CTParagraphStyleCreate((CTParagraphStyleSetting[7]){{kCTParagraphStyleSpecifierAlignment,sizeof(alignment),&alignment},{kCTParagraphStyleSpecifierLineBreakMode,sizeof(lineBreakMode),&lineBreakMode},{kCTParagraphStyleSpecifierMaximumLineHeight,sizeof(maximumLineHeight),&maximumLineHeight},{kCTParagraphStyleSpecifierMinimumLineHeight,sizeof(minimumLineHeight),&minimumLineHeight},{kCTParagraphStyleSpecifierMaximumLineSpacing,sizeof(linespace),&linespace},
         {kCTParagraphStyleSpecifierMinimumLineSpacing,sizeof(linespace),&linespace},{kCTParagraphStyleSpecifierFirstLineHeadIndent,sizeof(fristLineHead),&fristLineHead}}, 7);
     
-    NSDictionary *attributeDic = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)textColor.CGColor,kCTForegroundColorAttributeName,font,kCTFontAttributeName,paragraphStyle,kCTParagraphStyleAttributeName, nil];
+    
+    //新增每个字的间距
+    CFNumberRef num = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type, &_wordSpace);
+    
+    
+    NSDictionary *attributeDic = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)textColor.CGColor,kCTForegroundColorAttributeName,font,kCTFontAttributeName,paragraphStyle,kCTParagraphStyleAttributeName,num,kCTKernAttributeName, nil];
     
     NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:text attributes:attributeDic];
+    //        [attributeString addAttribute:(NSString *)kCTKernAttributeName value:(__bridge id)(num) range:NSMakeRange(0, 3)];
     
     NSMutableAttributedString *attributeHighString = [self highlightString:attributeString];
     
@@ -124,14 +131,7 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
     CFRelease(framesetter);
     CFRelease(paragraphStyle);
     CFRelease(font);
-    
-    
-    //        });
-    //    });
-    
-    
-    
-    
+    CFRelease(num);
 }
 
 - (void)drawFramesetter:(CTFramesetterRef)framesetter
@@ -261,10 +261,11 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
             {
                 if (labelImageView.image != nil && currentRange.location!=-1 && currentRange.location>=match.range.location && currentRange.length+currentRange.location<=match.range.length+match.range.location)
                 {
-                    NSString *str = [NSString stringWithFormat:@"你居然点击了 %@",[attributString.string substringWithRange:match.range]];
-                    NSLog(@"%@",str);
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:str delegate:nil cancelButtonTitle:@"确定" otherButtonTitles: nil];
-                    [alert show];
+                    NSString *str = [attributString.string substringWithRange:match.range];
+                    if (self.clickBlock)
+                    {
+                        self.clickBlock(str);
+                    }
                 }
             }
             
@@ -318,6 +319,12 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
 - (void)setTextColor:(UIColor *)textColor
 {
     _textColor = textColor;
+    [self setText:_text];
+}
+
+- (void)setWordSpace:(int)wordSpace
+{
+    _wordSpace = wordSpace;
     [self setText:_text];
 }
 

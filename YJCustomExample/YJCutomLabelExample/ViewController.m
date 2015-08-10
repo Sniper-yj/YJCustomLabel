@@ -25,6 +25,10 @@
     label.headSpace = 28;
     label.restrainArray = [NSMutableArray arrayWithObject:@"@[\u4e00-\u9fa5a-zA-Z0-9_-]{2,30}"];
     label.text = @"@小明，小明你太坏了，怎么喜欢你姐姐小红？@小红 因为姐姐是百度大神啊~@小红。";
+    label.wordSpace = 5;
+    label.clickBlock = ^(NSString *string){
+        NSLog(@"click word %@",string);
+    };
     [self.view addSubview:label];
 }
 
