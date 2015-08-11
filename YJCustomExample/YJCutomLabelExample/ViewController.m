@@ -20,14 +20,21 @@
     // Do any additional setup after loading the view, typically from a nib.
     self.view.backgroundColor = [UIColor whiteColor];
     YJCustomLabel *label = [[YJCustomLabel alloc] initWithFrame:CGRectMake(10, 100, 200, 300)];
+    //字体大小
     label.font = [UIFont systemFontOfSize:14];
     //头部空格
     label.headSpace = 28;
+    //正则数组
     label.restrainArray = [NSMutableArray arrayWithObject:@"@[\u4e00-\u9fa5a-zA-Z0-9_-]{2,30}"];
+    //内容
     label.text = @"@小明，小明你太坏了，怎么喜欢你姐姐小红？@小红 因为姐姐是百度大神啊~@小红。";
+    
     label.wordSpace = 5;
     label.clickBlock = ^(NSString *string){
         NSLog(@"click word %@",string);
+        NSString *str = [NSString stringWithFormat:@"您点击了 %@",string];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"提示" message:str delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil];
+        [alert show];
     };
     [self.view addSubview:label];
 }
