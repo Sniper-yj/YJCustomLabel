@@ -64,6 +64,7 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         _lineSpace = 5;
         _headSpace = 0;
         _wordSpace = 10;
+        _restrainColor = [UIColor blueColor];
         
     }
     return self;
@@ -110,7 +111,7 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         
         
         //新增每个字的间距
-        CFNumberRef num = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type, &_wordSpace);
+        CFNumberRef num = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &_wordSpace);
         
         
         NSDictionary *attributeDic = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)textColor.CGColor,kCTForegroundColorAttributeName,font,kCTFontAttributeName,paragraphStyle,kCTParagraphStyleAttributeName,num,kCTKernAttributeName, nil];
@@ -255,7 +256,14 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
                     runRect=CGRectMake(lineOrigin.x + offset, (self.frame.size.height)-y-height+runDescent/2, runRect.size.width, height);
                     NSRange nRange = NSMakeRange(range.location, range.length);
                     
-                    [framesDict setValue:[NSValue valueWithCGRect:runRect] forKey:NSStringFromRange(nRange)];
+                    if ([NSValue valueWithCGRect:runRect] == nil)
+                    {
+                        
+                    }
+                    else
+                    {
+                        [framesDict setValue:[NSValue valueWithCGRect:runRect] forKey:NSStringFromRange(nRange)];
+                    }
                 }
             }
         }
@@ -292,13 +300,13 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
                 }
                 else
                 {
-                    [attributString addAttribute:(NSString *)kCTForegroundColorAttributeName value:(__bridge id)[UIColor blueColor].CGColor range:match.range];
+                    [attributString addAttribute:(NSString *)kCTForegroundColorAttributeName value:(__bridge id)self.restrainColor.CGColor range:match.range];
                 }
             }
             else
             {
                 
-                [attributString addAttribute:(NSString *)kCTForegroundColorAttributeName value:(__bridge id)[UIColor blueColor].CGColor range:match.range];
+                [attributString addAttribute:(NSString *)kCTForegroundColorAttributeName value:(__bridge id)self.restrainColor.CGColor range:match.range];
             }
             
             
@@ -308,6 +316,12 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
 }
 
 #pragma mark - getter and setter
+
+-(void)setRestrainColor:(UIColor *)restrainColor
+{
+    _restrainColor = restrainColor;
+    [self setText:_text];
+}
 
 -(void)setRestrainArray:(NSMutableArray *)restrainArray
 {
