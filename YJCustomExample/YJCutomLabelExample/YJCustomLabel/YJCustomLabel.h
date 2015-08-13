@@ -15,6 +15,7 @@ typedef void (^clickBlock)(NSString *);
 @property(nonatomic,retain) UIFont             *font;
 @property(nonatomic,retain) UIColor            *textColor;
 @property(nonatomic)        NSTextAlignment    textAlignment;
+@property (nonatomic ,strong) UIColor *restrainColor;///<属于正则的字体颜色
 @property (nonatomic ,assign) CGFloat lineSpace;///<行间距
 @property (nonatomic ,assign) int wordSpace;///<每个字的间距
 @property (nonatomic ,strong) NSMutableArray *restrainArray;///<添加正则表达式的数组
