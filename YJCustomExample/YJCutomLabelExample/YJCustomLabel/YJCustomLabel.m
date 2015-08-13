@@ -111,7 +111,7 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         
         
         //新增每个字的间距
-        CFNumberRef num = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt8Type, &_wordSpace);
+        CFNumberRef num = CFNumberCreate(kCFAllocatorDefault, kCFNumberSInt32Type, &_wordSpace);
         
         
         NSDictionary *attributeDic = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)textColor.CGColor,kCTForegroundColorAttributeName,font,kCTFontAttributeName,paragraphStyle,kCTParagraphStyleAttributeName,num,kCTKernAttributeName, nil];
