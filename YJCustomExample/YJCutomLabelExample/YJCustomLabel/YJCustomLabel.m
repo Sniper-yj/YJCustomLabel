@@ -144,12 +144,8 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
                 labelImageView.image = screenShotimage;
             }
             
-            CFRelease(path);
-            CFRelease(frame);
             CFRelease(framesetter);
-            CFRelease(paragraphStyle);
             CFRelease(font);
-            CFRelease(num);
         });
     });
 }
@@ -255,24 +251,17 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
                     float height = runAscent;
                     runRect=CGRectMake(lineOrigin.x + offset, (self.frame.size.height)-y-height+runDescent/2, runRect.size.width, height);
                     NSRange nRange = NSMakeRange(range.location, range.length);
-                    
-                    if ([NSValue valueWithCGRect:runRect] == nil)
+                    @synchronized(self)
                     {
-                        
-                    }
-                    else
-                    {
-//                        [framesDict setValue:[NSValue valueWithCGRect:runRect] forKeyPath:NSStringFromRange(nRange)];
-                        [framesDict setObject:[NSValue valueWithCGRect:runRect] forKey:NSStringFromRange(nRange)];
-//                        [framesDict setValue:[NSValue valueWithCGRect:runRect] forKey:NSStringFromRange(nRange)];
+                        [framesDict setValue:[NSValue valueWithCGRect:runRect] forKey:NSStringFromRange(nRange)];
                     }
                 }
             }
         }
     }
     
-//    CFRelease(frame);
-//    CFRelease(path);
+    CFRelease(frame);
+    CFRelease(path);
 }
 
 #pragma mark - highlight
