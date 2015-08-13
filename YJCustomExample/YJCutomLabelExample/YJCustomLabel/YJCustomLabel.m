@@ -262,15 +262,17 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
                     }
                     else
                     {
-                        [framesDict setValue:[NSValue valueWithCGRect:runRect] forKey:NSStringFromRange(nRange)];
+//                        [framesDict setValue:[NSValue valueWithCGRect:runRect] forKeyPath:NSStringFromRange(nRange)];
+                        [framesDict setObject:[NSValue valueWithCGRect:runRect] forKey:NSStringFromRange(nRange)];
+//                        [framesDict setValue:[NSValue valueWithCGRect:runRect] forKey:NSStringFromRange(nRange)];
                     }
                 }
             }
         }
     }
     
-    CFRelease(frame);
-    CFRelease(path);
+//    CFRelease(frame);
+//    CFRelease(path);
 }
 
 #pragma mark - highlight
