@@ -118,14 +118,15 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         
         NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:text attributes:attributeDic];
         //        [attributeString addAttribute:(NSString *)kCTKernAttributeName value:(__bridge id)(num) range:NSMakeRange(0, 3)];
-        
+        attributeString = [self drawEmojiWithString:attributeString];
         NSMutableAttributedString *attributeHighString = [self highlightString:attributeString];
+//        attributeHighString = [self drawEmojiWithString:attributeHighString];
         
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributeHighString);
         
-        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, text.length), path, NULL);
+        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, attributeHighString.string.length), path, NULL);
         CGRect rect = CGRectMake(0, 0,(size.width),(size.height));
-        [self drawFramesetter:framesetter attributedString:attributeHighString textRange:CFRangeMake(0, _text.length) inRect:rect context:context];
+        [self drawFramesetter:framesetter attributedString:attributeHighString textRange:CFRangeMake(0, attributeHighString.string.length) inRect:rect context:context];
         
         CTFrameDraw(frame, context);
         UIImage *screenShotimage = UIGraphicsGetImageFromCurrentImageContext();
@@ -304,6 +305,35 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         }
     }
     return attributString;
+}
+
+#pragma mark - DrawEmoji
+
+- (NSMutableAttributedString *)drawEmojiWithString:(NSMutableAttributedString *)attributedString
+{
+    //@"(\\[\\w+\\])"
+    NSInteger rangeNow = 0;
+    NSString *emoji = @"(\\[\\w+\\])";
+    NSString *string = attributedString.string;
+    NSRange range = NSMakeRange(0, string.length);
+    NSArray *mathes = [[NSRegularExpression regularExpressionWithPattern:emoji options:NSRegularExpressionDotMatchesLineSeparators error:nil] matchesInString:string options:0 range:range];
+    for (NSTextCheckingResult *match in mathes)
+    {
+        NSRange range = NSMakeRange(0, 0);
+        if (rangeNow)
+        {
+            range = NSMakeRange(match.range.location - rangeNow, match.range.length);
+        }
+        else
+        {
+            range = NSMakeRange(match.range.location, match.range.length);
+        }
+        
+        [attributedString replaceCharactersInRange:range withString:@"  "];
+        rangeNow = rangeNow + range.length - 2;
+    }
+    return attributedString;
+    
 }
 
 #pragma mark - getter and setter
