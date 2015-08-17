@@ -15,6 +15,7 @@
 		787D465C1B7745DB00750B64 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 787D465A1B7745DB00750B64 /* LaunchScreen.xib */; };
 		787D46681B7745DB00750B64 /* YJCutomLabelExampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 787D46671B7745DB00750B64 /* YJCutomLabelExampleTests.m */; };
 		787D46741B7745EA00750B64 /* YJCustomLabel.m in Sources */ = {isa = PBXBuildFile; fileRef = 787D46731B7745EA00750B64 /* YJCustomLabel.m */; };
+		78A7A4121B8242280078A555 /* [smile].png in Resources */ = {isa = PBXBuildFile; fileRef = 78A7A4111B8242280078A555 /* [smile].png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -43,6 +44,7 @@
 		787D46671B7745DB00750B64 /* YJCutomLabelExampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = YJCutomLabelExampleTests.m; sourceTree = "<group>"; };
 		787D46721B7745EA00750B64 /* YJCustomLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YJCustomLabel.h; sourceTree = "<group>"; };
 		787D46731B7745EA00750B64 /* YJCustomLabel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YJCustomLabel.m; sourceTree = "<group>"; };
+		78A7A4111B8242280078A555 /* [smile].png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "[smile].png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 				787D46501B7745DB00750B64 /* AppDelegate.m */,
 				787D46521B7745DB00750B64 /* ViewController.h */,
 				787D46531B7745DB00750B64 /* ViewController.m */,
+				78A7A4111B8242280078A555 /* [smile].png */,
 				787D46551B7745DB00750B64 /* Main.storyboard */,
 				787D46581B7745DB00750B64 /* Images.xcassets */,
 				787D465A1B7745DB00750B64 /* LaunchScreen.xib */,
@@ -212,6 +215,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				78A7A4121B8242280078A555 /* [smile].png in Resources */,
 				787D46571B7745DB00750B64 /* Main.storyboard in Resources */,
 				787D465C1B7745DB00750B64 /* LaunchScreen.xib in Resources */,
 				787D46591B7745DB00750B64 /* Images.xcassets in Resources */,
@@ -430,6 +434,7 @@
 				787D466D1B7745DB00750B64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		787D466E1B7745DB00750B64 /* Build configuration list for PBXNativeTarget "YJCutomLabelExampleTests" */ = {
 			isa = XCConfigurationList;
@@ -438,6 +443,7 @@
 				787D46701B7745DB00750B64 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

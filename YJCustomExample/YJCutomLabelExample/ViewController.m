@@ -30,7 +30,7 @@
     //正则数组
     label.restrainArray = [NSMutableArray arrayWithObject:@"@[\u4e00-\u9fa5a-zA-Z0-9_-]{2,30}"];
     //内容
-    label.text = @"@小明，小[明你]太坏了😊，怎么[喜]欢[weixiosa]小红？@小红 因为姐姐是百[度大]神啊~@小红。";
+    label.text = @"@小明，小[明你]太坏了阿斯达，怎么[喜]欢[weixiosa]小红？@小红 因为姐姐是百[度大]神啊~@小红。";
     //每个字的间距
     label.wordSpace = 5;
     //属于正则的字体颜色
