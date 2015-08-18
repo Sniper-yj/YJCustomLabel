@@ -260,10 +260,10 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
                 {
                     NSRange range;
                     [[emojiDict valueForKey:emoji] getValue:&range];
-                    if (NSEqualRanges(range, rangeCocoa))
+                    if (rangeCocoa.length >= range.length && rangeCocoa.location <= range.location && (range.length + range.location) <= (rangeCocoa.length + rangeCocoa.location))
                     {
                         CGRect runRect;
-                        runRect.size.width = CTRunGetTypographicBounds(run, CFRangeMake(0,0), &runAscent, &runDescent, NULL);
+                        runRect.size.width = CTRunGetTypographicBounds(run, CFRangeMake(range.location,range.length), &runAscent, &runDescent, NULL);
                         float offset = CTLineGetOffsetForStringIndex(line, range.location, NULL);
                         float height = runAscent;
                         runRect=CGRectMake(lineOrigin.x + offset, (self.frame.size.height)-y-height+runDescent/2, runRect.size.width, height);
@@ -380,7 +380,7 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
     {
         CGRect rect = [[emojiNew valueForKey:key] CGRectValue];
         UIImage *image = [UIImage imageNamed:@"[smile]"];
-        [image drawInRect:rect];
+        [image drawInRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.height, rect.size.height)];
     }
     
 }
