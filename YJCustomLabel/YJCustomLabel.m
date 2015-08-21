@@ -23,6 +23,8 @@ static inline CGFLOAT_TYPE CGFloat_ceil(CGFLOAT_TYPE cgfloat) {
     UIImageView *HighlightLabelImageView;///<显示点击后的label内容图片
     NSInteger row;//行高
     NSMutableDictionary *framesDict;///<储存特殊位置的数组
+    NSMutableDictionary *emojiDict;///<储存emoji的位置数组
+    NSMutableDictionary *emojiNew;///<修改
     NSRange currentRange;///<当前的点击区域
     BOOL highlighting;///<是否是点击后高亮
 }
@@ -43,6 +45,8 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
     if (self)
     {
         framesDict = [NSMutableDictionary dictionary];
+        emojiDict = [NSMutableDictionary dictionary];
+        emojiNew = [NSMutableDictionary dictionary];
         labelImageView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, frame.size.width, frame.size.height)];
         labelImageView.contentMode = UIViewContentModeScaleAspectFit;
         labelImageView.tag = NSIntegerMin;
@@ -87,6 +91,7 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         CGSize size = self.frame.size;
         UIGraphicsBeginImageContextWithOptions(size, ![self.backgroundColor isEqual:[UIColor clearColor]], 0);
         CGContextRef context = UIGraphicsGetCurrentContext();
+        CGContextSaveGState(context);
         if (context == NULL)
         {
             return;
@@ -118,16 +123,18 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         
         NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:text attributes:attributeDic];
         //        [attributeString addAttribute:(NSString *)kCTKernAttributeName value:(__bridge id)(num) range:NSMakeRange(0, 3)];
-        
+        attributeString = [self drawEmojiWithString:attributeString];
         NSMutableAttributedString *attributeHighString = [self highlightString:attributeString];
+//        attributeHighString = [self drawEmojiWithString:attributeHighString];
         
         CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributeHighString);
         
-        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, text.length), path, NULL);
+        CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, attributeHighString.string.length), path, NULL);
         CGRect rect = CGRectMake(0, 0,(size.width),(size.height));
-        [self drawFramesetter:framesetter attributedString:attributeHighString textRange:CFRangeMake(0, _text.length) inRect:rect context:context];
-        
+        [self drawFramesetter:framesetter attributedString:attributeHighString textRange:CFRangeMake(0, attributeHighString.string.length) inRect:rect context:context];
         CTFrameDraw(frame, context);
+        CGContextRestoreGState(context);
+        [self drowEmojiWithContext:context];
         UIImage *screenShotimage = UIGraphicsGetImageFromCurrentImageContext();
         UIGraphicsEndImageContext();
         dispatch_async(dispatch_get_main_queue(), ^{
@@ -235,15 +242,46 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
             CGContextSetTextPosition(c, penOffset, y);
             //            CTLineDraw(line, c);
         }
-        if (!highlighting) {
+//        if (!highlighting)
+//        {
+        
+
             CFArrayRef runs = CTLineGetGlyphRuns(line);
-            for (int j = 0; j < CFArrayGetCount(runs); j++) {
+        
+            for (int j = 0; j < CFArrayGetCount(runs); j++)
+            {
                 CGFloat runAscent;
                 CGFloat runDescent;
                 CTRunRef run = CFArrayGetValueAtIndex(runs, j);
                 NSDictionary* attributes = (__bridge NSDictionary*)CTRunGetAttributes(run);
+                CFRange range = CTRunGetStringRange(run);
+                NSRange rangeCocoa = NSMakeRange(range.location, range.length);
+                for (NSString *emoji in emojiDict.allKeys)
+                {
+                    NSRange range;
+                    [[emojiDict valueForKey:emoji] getValue:&range];
+                    if (rangeCocoa.length >= range.length && rangeCocoa.location <= range.location && (range.length + range.location) <= (rangeCocoa.length + rangeCocoa.location))
+                    {
+                        CGRect runRect;
+                        runRect.size.width = CTRunGetTypographicBounds(run, CFRangeMake(range.location,range.length), &runAscent, &runDescent, NULL);
+                        float offset = CTLineGetOffsetForStringIndex(line, range.location, NULL);
+                        float height = runAscent;
+                        runRect=CGRectMake(lineOrigin.x + offset, (self.frame.size.height)-y-height+runDescent/2, runRect.size.width, height);
+                        NSLog(@"%zd %zd",range.location,range.length);
+                        NSLog(@"%@",NSStringFromCGRect(runRect));
+//                        UIImage *image = [UIImage imageNamed:@"[smile]"];
+                        //        CGContextDrawImage(context, CGRectMake(0, 0, 10, 10), image.CGImage);
+//                        [image drawInRect:runRect];
+                        [emojiNew setValue:[NSValue valueWithCGRect:runRect] forKey:emoji];
+                        
+//                        [image drawInRect:runRect];
+                        
+//                        CGContextDrawImage(c, runRect, image.CGImage);
+                    }
+                }
                 if (!CGColorEqualToColor((__bridge CGColorRef)([attributes valueForKey:@"CTForegroundColor"]), self.textColor.CGColor)
-                    && framesDict!=nil) {
+                    && framesDict!=nil && !highlighting)
+                {
                     CFRange range = CTRunGetStringRange(run);
                     CGRect runRect;
                     runRect.size.width = CTRunGetTypographicBounds(run, CFRangeMake(0,0), &runAscent, &runDescent, NULL);
@@ -257,7 +295,7 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
                     }
                 }
             }
-        }
+//        }
     }
     
     CFRelease(frame);
@@ -304,6 +342,47 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         }
     }
     return attributString;
+}
+
+#pragma mark - DrawEmoji
+
+- (NSMutableAttributedString *)drawEmojiWithString:(NSMutableAttributedString *)attributedString
+{
+    //@"(\\[\\w+\\])"
+    NSInteger rangeNow = 0;
+    NSString *emoji = @"(\\[\\w+\\])";
+    NSString *string = attributedString.string;
+    NSRange range = NSMakeRange(0, string.length);
+    NSArray *mathes = [[NSRegularExpression regularExpressionWithPattern:emoji options:NSRegularExpressionDotMatchesLineSeparators error:nil] matchesInString:string options:0 range:range];
+    for (NSTextCheckingResult *match in mathes)
+    {
+        NSRange range = NSMakeRange(0, 0);
+        if (rangeNow)
+        {
+            range = NSMakeRange(match.range.location - rangeNow, match.range.length);
+        }
+        else
+        {
+            range = NSMakeRange(match.range.location, match.range.length);
+        }
+        NSString *emojiString = [attributedString.string substringWithRange:range];
+        [emojiDict setValue:[NSValue valueWithRange:NSMakeRange(range.location, 2)] forKey:emojiString];
+        [attributedString replaceCharactersInRange:range withString:@"  "];
+        rangeNow = rangeNow + range.length - 2;
+    }
+    return attributedString;
+    
+}
+
+- (void)drowEmojiWithContext:(CGContextRef)ref
+{
+    for (NSString *key in emojiNew.allKeys)
+    {
+        CGRect rect = [[emojiNew valueForKey:key] CGRectValue];
+        UIImage *image = [UIImage imageNamed:@"[smile]"];
+        [image drawInRect:CGRectMake(rect.origin.x, rect.origin.y, rect.size.height, rect.size.height)];
+    }
+    
 }
 
 #pragma mark - getter and setter
