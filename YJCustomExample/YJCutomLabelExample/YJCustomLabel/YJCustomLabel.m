@@ -29,7 +29,7 @@ static inline CGFLOAT_TYPE CGFloat_ceil(CGFLOAT_TYPE cgfloat) {
     BOOL highlighting;///<是否是点击后高亮
 }
 
-
+/**将text显示的格式转换成core Text类型*/
 CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
     switch (alignment) {
         case NSTextAlignmentLeft: return kCTLeftTextAlignment;
@@ -38,6 +38,7 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         default: return kCTNaturalTextAlignment;
     }
 }
+
 
 -(instancetype)initWithFrame:(CGRect)frame
 {
@@ -84,14 +85,20 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
         HighlightLabelImageView.image = nil;
         return;
     }
+    //异步渲染,在异步进行文字的绘制，然后在主线程渲染到imageView上
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         NSString *textMessage = text;
         _text = textMessage;
         UIColor *textColor = self.textColor;
         CGSize size = self.frame.size;
+        
+        //获得image的绘制上下文
         UIGraphicsBeginImageContextWithOptions(size, ![self.backgroundColor isEqual:[UIColor clearColor]], 0);
         CGContextRef context = UIGraphicsGetCurrentContext();
+        
+        //这里使用saveState将上下文储存是为了下面在图文混排的时候出现的图片翻转的bug
         CGContextSaveGState(context);
+        
         if (context == NULL)
         {
             return;
@@ -100,14 +107,19 @@ CTTextAlignment CTTextAlignmentFromUITextAlignment(NSTextAlignment alignment) {
             [self.backgroundColor set];
             CGContextFillRect(context, CGRectMake(0, 0, size.width, size.height));
         }
+        
+        //这里是转换坐标系
         CGContextSetTextMatrix(context,CGAffineTransformIdentity);
         CGContextTranslateCTM(context,0,size.height);
         CGContextScaleCTM(context,1.0,-1.0);
+        
         CGMutablePathRef path = CGPathCreateMutable();
         CGPathAddRect(path, NULL, self.bounds);
         
         CGFloat minimumLineHeight = self.font.pointSize,maximumLineHeight = minimumLineHeight, linespace = self.lineSpace;
         CGFloat fristLineHead = _headSpace;
+        
+        //CTLineBreakMode 这个是换行的格式，可以去看看官文
         CTLineBreakMode lineBreakMode = kCTLineBreakByCharWrapping;
         CTTextAlignment alignment = CTTextAlignmentFromUITextAlignment(self.textAlignment);
         CTFontRef font = CTFontCreateWithName((__bridge CFStringRef)self.font.fontName, self.font.pointSize, NULL);

@@ -7,14 +7,14 @@
 	<key>IDESourceControlProjectIdentifier</key>
 	<string>F9675F79-2424-4D22-8C4F-12CF56BD6370</string>
 	<key>IDESourceControlProjectName</key>
-	<string>project</string>
+	<string>YJCutomLabelExample</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
 		<key>9F98069FAEA32BDC61508359BA07E7305A2D5E3E</key>
 		<string>https://github.com/Sniper-yj/YJCustomLabel.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>YJCustomExample/YJCutomLabelExample.xcodeproj/project.xcworkspace</string>
+	<string>YJCustomExample/YJCutomLabelExample.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
 		<key>9F98069FAEA32BDC61508359BA07E7305A2D5E3E</key>
